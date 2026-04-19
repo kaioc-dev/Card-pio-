@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cardápio Digital</title>
+    <title>AnoteBar - Sistema de Pedidos</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
+        /* Variáveis de Tema (Sci-Fi / Cyberpunk) */
         :root {
             --neon-primary: #00f3ff; 
             --neon-secondary: #ff00ea; 
+            --neon-danger: #ff3333;
             --bg-color: #0d0d12;
             --card-bg: #1a1a24;
             --text-color: #ffffff;
@@ -29,9 +31,10 @@
             padding-bottom: 100px; 
         }
 
+        /* Cabeçalho e Seleção de Mesa */
         header {
             text-align: center;
-            padding: 25px 15px;
+            padding: 20px 15px;
             background: linear-gradient(180deg, rgba(0, 243, 255, 0.1) 0%, transparent 100%);
             border-bottom: 1px solid rgba(0, 243, 255, 0.3);
             box-shadow: 0 4px 15px rgba(0, 243, 255, 0.1);
@@ -39,12 +42,39 @@
 
         header h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 28px;
+            font-size: 26px;
             color: var(--text-color);
             text-shadow: 0 0 10px var(--neon-primary), 0 0 20px var(--neon-primary);
             letter-spacing: 2px;
+            margin-bottom: 15px;
         }
 
+        .table-selector {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--neon-primary);
+        }
+
+        .table-selector select {
+            background: transparent;
+            color: var(--neon-primary);
+            border: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .table-selector select option {
+            background-color: var(--bg-color);
+            color: #fff;
+        }
+
+        /* Categorias */
         .categories {
             display: flex;
             overflow-x: auto;
@@ -52,7 +82,6 @@
             gap: 10px;
             scrollbar-width: none;
         }
-        
         .categories::-webkit-scrollbar { display: none; }
 
         .category-btn {
@@ -74,6 +103,7 @@
             box-shadow: 0 0 10px rgba(0, 243, 255, 0.4) inset, 0 0 10px rgba(0, 243, 255, 0.4);
         }
 
+        /* Lista de Produtos */
         .menu-container {
             padding: 15px;
             display: flex;
@@ -122,7 +152,7 @@
             color: #aaa;
             line-height: 1.2;
             margin-bottom: 8px;
-            padding-right: 30px;
+            padding-right: 35px;
         }
 
         .item-price {
@@ -132,7 +162,6 @@
             text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
         }
 
-        /* Botão de Adicionar ao Carrinho */
         .add-btn {
             position: absolute;
             bottom: 15px;
@@ -158,7 +187,7 @@
             transform: scale(0.9);
         }
 
-        /* Botão Flutuante do Carrinho */
+        /* Interface da Sacola */
         .cart-floating-btn {
             position: fixed;
             bottom: 20px;
@@ -178,8 +207,6 @@
             transition: 0.3s;
         }
 
-        .cart-floating-btn:active { transform: scale(0.95); }
-
         .cart-count {
             background-color: var(--neon-secondary);
             color: #fff;
@@ -193,7 +220,7 @@
             font-weight: bold;
         }
 
-        /* Modal do Carrinho */
+        /* Modal */
         .modal {
             display: none; 
             position: fixed;
@@ -201,7 +228,7 @@
             background-color: rgba(0, 0, 0, 0.8);
             z-index: 200;
             justify-content: center;
-            align-items: flex-end; /* Modal sobe de baixo */
+            align-items: flex-end;
         }
 
         .modal.open { display: flex; }
@@ -209,7 +236,7 @@
         .modal-content {
             background-color: var(--bg-color);
             width: 100%;
-            max-height: 80vh;
+            max-height: 85vh;
             border-top: 2px solid var(--neon-primary);
             border-radius: 20px 20px 0 0;
             padding: 20px;
@@ -233,14 +260,12 @@
             font-size: 20px;
         }
 
-        .close-btn {
-            background: none; border: none; color: #fff; font-size: 24px; cursor: pointer;
-        }
+        .close-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
 
         .cart-items-container {
             overflow-y: auto;
             flex: 1;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             padding-right: 5px;
         }
 
@@ -248,7 +273,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -266,32 +291,50 @@
             background-color: #2a2a36;
             border: 1px solid var(--text-color);
             color: #fff;
-            width: 25px; height: 25px;
+            width: 28px; height: 28px;
             border-radius: 5px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer;
+            font-size: 16px;
         }
 
         .total-container {
             font-family: 'Orbitron', sans-serif;
-            font-size: 22px;
+            font-size: 20px;
             text-align: right;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: var(--neon-secondary);
         }
 
-        .checkout-btn {
-            background-color: #25D366; /* Verde WhatsApp */
-            color: white;
-            border: none;
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
             padding: 15px;
             border-radius: 10px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             text-align: center;
+            border: none;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .checkout-btn {
+            background-color: #25D366; 
             box-shadow: 0 0 10px rgba(37, 211, 102, 0.4);
+        }
+
+        .clear-btn {
+            background-color: transparent;
+            border: 1px solid var(--neon-danger);
+            color: var(--neon-danger);
+            flex: 0.5;
         }
 
     </style>
@@ -299,7 +342,11 @@
 <body>
 
     <header>
-        <h1>SYSTEM MENU</h1>
+        <h1>ANOTEBAR SYSTEM</h1>
+        <div class="table-selector">
+            <label>MESA</label>
+            <select id="table-select" onchange="saveTable()"></select>
+        </div>
     </header>
 
     <div class="categories">
@@ -311,26 +358,29 @@
 
     <div class="menu-container" id="menu-list"></div>
 
-    <div class="cart-floating-btn" onclick="toggleCart()">
-        🛒 Sacola <div class="cart-count" id="cart-count-badge">0</div>
+    <div class="cart-floating-btn" id="cart-float" onclick="toggleCart()">
+        🛒 Pedido <div class="cart-count" id="cart-count-badge">0</div>
     </div>
 
     <div class="modal" id="cart-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <span>SUA SACOLA</span>
+                <span>MESA <span id="modal-table-display">1</span></span>
                 <button class="close-btn" onclick="toggleCart()">&times;</button>
             </div>
-            <div class="cart-items-container" id="cart-items-list">
-                </div>
+            <div class="cart-items-container" id="cart-items-list"></div>
             <div class="total-container">
                 Total: R$ <span id="cart-total-price">0,00</span>
             </div>
-            <button class="checkout-btn" onclick="sendToWhatsApp()">ENVIAR PEDIDO 📱</button>
+            <div class="action-buttons">
+                <button class="btn clear-btn" onclick="clearCart()">LIMPAR</button>
+                <button class="btn checkout-btn" onclick="sendToWhatsApp()">ENVIAR 📱</button>
+            </div>
         </div>
     </div>
 
     <script>
+        // Banco de Dados Simulado
         const menuData = [
             { id: 1, name: "Cyber Burger", desc: "Pão brioche, blend 180g, cheddar, bacon e molho especial.", price: 32.90, category: "burgers", icon: "🍔" },
             { id: 2, name: "Neon Smash", desc: "Pão tradicional, 2x smash 90g, queijo prato e cebola caramelizada.", price: 26.50, category: "burgers", icon: "🍔" },
@@ -339,25 +389,46 @@
             { id: 5, name: "Combo Matrix", desc: "1 Cyber Burger + Fritas + Refrigerante.", price: 45.00, category: "combos", icon: "🍟" }
         ];
 
-        let cart = [];
+        // Recupera dados persistentes ou inicia vazios
+        let cart = JSON.parse(localStorage.getItem('anotebar_cart')) || [];
+        let currentTable = localStorage.getItem('anotebar_table') || '1';
 
         const menuList = document.getElementById('menu-list');
-        const categoryBtns = document.querySelectorAll('.category-btn');
-        const cartModal = document.getElementById('cart-modal');
         const cartItemsList = document.getElementById('cart-items-list');
         const cartCountBadge = document.getElementById('cart-count-badge');
         const cartTotalPrice = document.getElementById('cart-total-price');
+        const tableSelect = document.getElementById('table-select');
+        const modalTableDisplay = document.getElementById('modal-table-display');
 
-        // Formatar valor para Moeda BR
+        // Inicializar opções de 25 mesas
+        function initTables() {
+            for(let i = 1; i <= 25; i++) {
+                tableSelect.innerHTML += `<option value="${i}">${i < 10 ? '0'+i : i}</option>`;
+            }
+            tableSelect.value = currentTable;
+            modalTableDisplay.innerText = currentTable;
+        }
+
+        // Salvar mesa no armazenamento local
+        function saveTable() {
+            currentTable = tableSelect.value;
+            localStorage.setItem('anotebar_table', currentTable);
+            modalTableDisplay.innerText = currentTable;
+        }
+
+        // Persistir sacola
+        function saveCart() {
+            localStorage.setItem('anotebar_cart', JSON.stringify(cart));
+        }
+
         function formatMoney(value) {
             return value.toFixed(2).replace('.', ',');
         }
 
-        // Renderizar Lista de Produtos
         function renderItems(items) {
             menuList.innerHTML = '';
             items.forEach(item => {
-                const itemHTML = `
+                menuList.innerHTML += `
                     <div class="menu-item">
                         <div class="item-image">${item.icon}</div>
                         <div class="item-details">
@@ -368,33 +439,23 @@
                         <button class="add-btn" onclick="addToCart(${item.id})">+</button>
                     </div>
                 `;
-                menuList.innerHTML += itemHTML;
             });
         }
 
-        // Filtro de Categorias
         function filterMenu(category) {
-            categoryBtns.forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-
-            if (category === 'todos') {
-                renderItems(menuData);
-            } else {
-                const filtered = menuData.filter(item => item.category === category);
-                renderItems(filtered);
-            }
+            renderItems(category === 'todos' ? menuData : menuData.filter(item => item.category === category));
         }
 
-        // Lógica do Carrinho
         function addToCart(id) {
             const product = menuData.find(item => item.id === id);
             const existingItem = cart.find(item => item.id === id);
-
-            if (existingItem) {
-                existingItem.qtd += 1;
-            } else {
-                cart.push({ ...product, qtd: 1 });
-            }
+            
+            if (existingItem) existingItem.qtd += 1;
+            else cart.push({ ...product, qtd: 1 });
+            
+            saveCart();
             updateCartUI();
         }
 
@@ -402,17 +463,25 @@
             const item = cart.find(i => i.id === id);
             if (item) {
                 item.qtd += delta;
-                if (item.qtd <= 0) {
-                    cart = cart.filter(i => i.id !== id);
-                }
+                if (item.qtd <= 0) cart = cart.filter(i => i.id !== id);
+                saveCart();
                 updateCartUI();
+            }
+        }
+
+        // Esvazia manualmente a sacola 
+        function clearCart() {
+            if(confirm("Tem certeza que deseja limpar os pedidos desta mesa?")) {
+                cart = [];
+                saveCart();
+                updateCartUI();
+                toggleCart(); // Fecha o modal
             }
         }
 
         function updateCartUI() {
             cartItemsList.innerHTML = '';
-            let total = 0;
-            let count = 0;
+            let total = 0; let count = 0;
 
             cart.forEach(item => {
                 total += item.price * item.qtd;
@@ -435,48 +504,40 @@
 
             cartCountBadge.innerText = count;
             cartTotalPrice.innerText = formatMoney(total);
-
-            // Ocultar botão flutuante se a sacola estiver vazia
-            document.querySelector('.cart-floating-btn').style.display = count > 0 ? 'flex' : 'none';
+            document.getElementById('cart-float').style.display = count > 0 ? 'flex' : 'none';
         }
 
         function toggleCart() {
-            cartModal.classList.toggle('open');
+            document.getElementById('cart-modal').classList.toggle('open');
         }
 
-        // Fechar modal clicando fora dele
         window.onclick = function(event) {
-            if (event.target === cartModal) toggleCart();
+            if (event.target === document.getElementById('cart-modal')) toggleCart();
         }
 
-        // Enviar para o WhatsApp
         function sendToWhatsApp() {
-            if (cart.length === 0) {
-                alert("Sua sacola está vazia!");
-                return;
-            }
+            if (cart.length === 0) return alert("A mesa não possui pedidos!");
 
-            let text = "Olá! Gostaria de fazer o seguinte pedido:%0A%0A"; // %0A é a quebra de linha na URL
-            
+            let text = `*PEDIDO - MESA ${currentTable}*%0A%0A`; 
             let total = 0;
+            
             cart.forEach(item => {
                 const itemTotal = item.price * item.qtd;
                 total += itemTotal;
                 text += `▪️ *${item.qtd}x* ${item.name} - R$ ${formatMoney(itemTotal)}%0A`;
             });
 
-            text += `%0A*Total a pagar: R$ ${formatMoney(total)}*`;
+            text += `%0A*Total: R$ ${formatMoney(total)}*`;
 
-            const phone = "5581921426179"; // Número fornecido com DDI 55 do Brasil
-            const whatsappUrl = `https://wa.me/${phone}?text=${text}`;
-            
-            window.open(whatsappUrl, '_blank');
+            const phone = "5581921426179"; 
+            window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
         }
 
-        // Iniciar
+        // Inicialização
         window.onload = () => {
+            initTables();
             renderItems(menuData);
-            updateCartUI(); // Inicializa ocultando o botão flutuante se estiver vazio
+            updateCartUI(); 
         };
     </script>
 </body>
